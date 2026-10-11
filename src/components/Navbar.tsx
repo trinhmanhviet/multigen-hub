@@ -45,12 +45,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab = 'Trang chủ' }) => 
             Hướng dẫn
           </a>
           <a
-            href="https://github.com/trinhmanhviet"
+            href="https://trinhmanhviet.dev"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm font-medium text-gray-500 hover:text-zinc-900 transition-colors py-1"
           >
-            Tài nguyên
+            About Me
           </a>
         </nav>
 
@@ -64,15 +64,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab = 'Trang chủ' }) => 
 
           {/* User Profile */}
           <a
-            href="https://github.com/trinhmanhviet"
+            href="https://trinhmanhviet.dev"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-2 text-zinc-700 hover:text-zinc-900 transition-colors py-1 pl-1"
+            title="Portfolio của Manh Viet"
           >
             <div className="w-7 h-7 rounded-full bg-zinc-900 text-white text-xs font-semibold flex items-center justify-center select-none shadow-2xs">
-              T
+              V
             </div>
-            <span className="text-xs font-medium hidden sm:inline">Trịnh Mạnh Việt</span>
+            <span className="text-xs font-medium hidden sm:inline">Manh Viet</span>
             <ChevronDown className="w-3.5 h-3.5 text-gray-400 hidden sm:inline" />
           </a>
         </div>

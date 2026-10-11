@@ -63,7 +63,7 @@ export const QuickStats: React.FC = () => {
         <div className="min-w-0">
           <span className="font-semibold text-sm text-white">Creator Focused</span>
           <p className="text-xs text-slate-400 mt-0.5 truncate">
-            Xây dựng bởi Trịnh Mạnh Việt
+            Xây dựng bởi Manh Viet
           </p>
         </div>
       </div>

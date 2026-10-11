@@ -27,6 +27,17 @@ export const App: React.FC = () => {
     return SERVICES.find((s) => s.id === selectedServiceId) || SERVICES[0];
   }, [selectedServiceId]);
 
+  // Smooth scroll down to the detail section when a card is selected
+  const handleSelectService = (id: string) => {
+    setSelectedServiceId(id);
+    setTimeout(() => {
+      const detailElement = document.getElementById('tool-detail');
+      if (detailElement) {
+        detailElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
+  };
+
   // Keyboard shortcut '/' to focus search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -229,7 +240,7 @@ export const App: React.FC = () => {
                 key={service.id}
                 service={service}
                 isSelected={service.id === selectedServiceId}
-                onSelect={(id) => setSelectedServiceId(id)}
+                onSelect={handleSelectService}
               />
             ))}
           </div>
@@ -257,7 +268,7 @@ export const App: React.FC = () => {
         {/* Dynamic Detail & Workflow Section (Changes based on selected card) */}
         <div
           id="tool-detail"
-          className="bg-white border-2 border-zinc-900/10 rounded-3xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative overflow-hidden"
+          className="scroll-mt-24 bg-white border-2 border-zinc-900/10 rounded-3xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative overflow-hidden"
         >
           {/* Top Header of Selected Tool */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-100">
@@ -376,12 +387,12 @@ export const App: React.FC = () => {
           <div>
             © {new Date().getFullYear()} <span className="font-semibold text-zinc-900">MultiGen Workbench</span> — Xây dựng bởi{' '}
             <a
-              href="https://github.com/trinhmanhviet"
+              href="https://trinhmanhviet.dev"
               target="_blank"
               rel="noopener noreferrer"
               className="text-zinc-900 font-medium hover:underline"
             >
-              Trịnh Mạnh Việt
+              Manh Viet
             </a>
           </div>
           <div className="flex items-center space-x-4">
