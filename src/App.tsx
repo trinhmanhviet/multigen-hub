@@ -1,142 +1,272 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Sparkles, Compass } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import {
+  Search,
+  Database,
+  Cpu,
+  Image as ImageIcon,
+  Gamepad2,
+  ChevronRight,
+  Compass,
+} from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { QuickStats } from './components/QuickStats';
 import { ServiceCard } from './components/ServiceCard';
 import { SERVICES, CATEGORIES } from './data/services';
 
 export const App: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcut '/' to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && document.activeElement !== searchInputRef.current) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      } else if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        searchInputRef.current?.blur();
+        if (searchQuery) setSearchQuery('');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchQuery]);
 
   const filteredServices = useMemo(() => {
     return SERVICES.filter((service) => {
       const matchesCategory =
-        selectedCategory === 'All' || service.category === selectedCategory;
+        selectedCategory === 'Tất cả' || service.category === selectedCategory;
 
+      const q = searchQuery.toLowerCase();
       const matchesSearch =
-        service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        service.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        service.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        service.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        service.name.toLowerCase().includes(q) ||
+        service.description.toLowerCase().includes(q) ||
+        service.tags.some((tag) => tag.toLowerCase().includes(q));
 
       return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, searchQuery]);
 
-  return (
-    <div className="min-h-screen bg-slate-950 flex flex-col relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl pointer-events-none" />
+  // Category counts
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { 'Tất cả': SERVICES.length };
+    CATEGORIES.forEach((cat) => {
+      if (cat !== 'Tất cả') {
+        counts[cat] = SERVICES.filter((s) => s.category === cat).length;
+      }
+    });
+    return counts;
+  }, []);
 
+  return (
+    <div className="min-h-screen bg-[#0c0e12] flex flex-col text-slate-100 font-sans selection:bg-white/20 selection:text-white">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>MultiGen Ecosystem Portal</span>
+        <div className="max-w-3xl mb-8">
+          <div className="flex items-center space-x-1.5 text-[11px] font-mono tracking-wider uppercase text-slate-400 font-semibold mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+            <span>CREATIVE TOOLS HUB</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-            Cổng Điều Hướng Dịch Vụ{' '}
-            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-              MultiGen
-            </span>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-2.5 leading-tight">
+            Tất cả công cụ của MultiGen — gọn gàng ở một nơi
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl mx-auto">
-            Khám phá và khởi chạy nhanh các công cụ AI thế hệ mới, ứng dụng cắt ghép video, bộ công cụ thiết kế pixel art và máy chủ ComfyUI trên tên miền{' '}
-            <span className="font-mono text-purple-300 font-medium">multigen.store</span>.
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl">
+            Bộ công cụ AI, video, pixel art và sáng tạo nội dung, chạy trên hạ tầng GPU riêng.
+            <br />
+            Đơn giản, nhanh và tập trung cho công việc thật sự quan trọng.
           </p>
         </div>
 
-        {/* Quick Stats Banner */}
+        {/* Top 4 Spec Cards */}
         <QuickStats />
 
-        {/* Search & Filter Bar */}
-        <div className="glass-panel rounded-2xl p-4 sm:p-5 mb-8 border border-slate-800/80 shadow-xl">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            {/* Search Input */}
-            <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Tìm kiếm dịch vụ, mô hình AI, công cụ..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
-              />
-              {searchQuery && (
+        {/* Search & Category Filter Bar */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 mb-6">
+          {/* Search Box */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Tìm công cụ, ví dụ: video, pixel, comfyui..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 rounded-full bg-zinc-900/90 border border-white/[0.08] text-xs sm:text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-white/20 transition-all font-sans"
+            />
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
+              {searchQuery ? (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-300"
+                  className="text-xs text-slate-400 hover:text-slate-200 px-1"
                 >
-                  Clear
+                  Xoá
                 </button>
+              ) : (
+                <span className="w-4 h-4 rounded bg-zinc-800 text-[10px] text-slate-400 border border-white/10 flex items-center justify-center font-mono select-none">
+                  /
+                </span>
               )}
             </div>
+          </div>
 
-            {/* Category Tabs */}
-            <div className="flex flex-wrap gap-1.5 w-full md:w-auto">
-              {CATEGORIES.map((cat) => (
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {CATEGORIES.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              const count = categoryCounts[cat] || 0;
+
+              return (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                    selectedCategory === cat
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/25'
-                      : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 border border-slate-800/60'
+                  className={`px-3.5 py-1.5 rounded-full text-xs transition-all flex items-center space-x-1.5 ${
+                    isSelected
+                      ? 'bg-white text-zinc-950 font-medium shadow-sm'
+                      : 'bg-zinc-900/80 hover:bg-zinc-800 text-slate-400 hover:text-slate-200 border border-white/[0.07]'
                   }`}
                 >
-                  {cat === 'All' ? 'Tất cả' : cat}
+                  <span>{cat}</span>
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                      isSelected
+                        ? 'bg-zinc-200 text-zinc-900 font-semibold'
+                        : 'bg-white/[0.06] text-slate-400'
+                    }`}
+                  >
+                    {count}
+                  </span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Services Grid */}
+        {/* 5 Tool Cards Grid */}
         {filteredServices.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 mb-8">
             {filteredServices.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 glass-panel rounded-2xl border border-slate-800">
-            <Compass className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-slate-300 mb-1">Không tìm thấy dịch vụ</h3>
-            <p className="text-sm text-slate-500 mb-4">
-              Không có dịch vụ nào khớp với từ khóa "{searchQuery}"
+          <div className="text-center py-16 bg-[#13151b] rounded-2xl border border-white/[0.07] mb-8">
+            <Compass className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+            <h3 className="text-base font-semibold text-slate-200 mb-1">
+              Không tìm thấy công cụ phù hợp
+            </h3>
+            <p className="text-xs text-slate-400 mb-4 max-w-sm mx-auto">
+              Không có ứng dụng nào khớp với từ khóa "{searchQuery}".
             </p>
             <button
               onClick={() => {
                 setSearchQuery('');
-                setSelectedCategory('All');
+                setSelectedCategory('Tất cả');
               }}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs text-slate-200 font-medium transition-colors border border-white/[0.08]"
             >
               Đặt lại bộ lọc
             </button>
           </div>
         )}
-      </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 py-6 mt-12 text-center text-xs text-slate-500 glass-panel">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div>
-            © {new Date().getFullYear()} <span className="text-slate-400 font-semibold">MultiGen Ecosystem</span> — Powered by Vercel, Render & Cloudflare.
-          </div>
-          <div className="flex items-center space-x-4 text-slate-400">
-            <span className="font-mono text-purple-400">hub.multigen.store</span>
+        {/* CREATOR'S WORKFLOW (Bottom Section) */}
+        <div className="bg-[#12141a] border border-white/[0.07] rounded-2xl p-5 sm:p-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            {/* Left Header */}
+            <div className="max-w-md shrink-0">
+              <div className="text-[10px] font-mono tracking-wider uppercase text-slate-400 font-semibold mb-1">
+                CREATOR'S WORKFLOW
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-white">
+                Từ dữ liệu đến game assets
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Quy trình làm việc đơn giản mà hiệu quả, được mình sử dụng hàng ngày.
+              </p>
+            </div>
+
+            {/* Right Steps Pipeline */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-3 w-full lg:w-auto">
+              {/* Step 1 */}
+              <div className="flex items-center space-x-2.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                  1
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
+                  <Database className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white">Dataset</div>
+                  <div className="text-[11px] text-slate-400">Chuẩn bị và xử lý dữ liệu</div>
+                </div>
+              </div>
+
+              {/* Connector 1 */}
+              <div className="hidden sm:flex items-center text-slate-600 px-1">
+                <ChevronRight className="w-4 h-4" />
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex items-center space-x-2.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                  2
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
+                  <Cpu className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white">Train GPU</div>
+                  <div className="text-[11px] text-slate-400">Huấn luyện mô hình</div>
+                </div>
+              </div>
+
+              {/* Connector 2 */}
+              <div className="hidden sm:flex items-center text-slate-600 px-1">
+                <ChevronRight className="w-4 h-4" />
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex items-center space-x-2.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                  3
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
+                  <ImageIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white">Generation</div>
+                  <div className="text-[11px] text-slate-400">Tạo hình ảnh / video</div>
+                </div>
+              </div>
+
+              {/* Connector 3 */}
+              <div className="hidden sm:flex items-center text-slate-600 px-1">
+                <ChevronRight className="w-4 h-4" />
+              </div>
+
+              {/* Step 4 */}
+              <div className="flex items-center space-x-2.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                  4
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
+                  <Gamepad2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white">Game Assets</div>
+                  <div className="text-[11px] text-slate-400">Tích hợp vào dự án game</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </footer>
+      </main>
     </div>
   );
 };

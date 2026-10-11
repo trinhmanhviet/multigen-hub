@@ -3,49 +3,94 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #0a0b0e;
+    color: #e2e8f0;
+    overflow-x: hidden;
   }
 }
 
-/* Glassmorphism effects */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Studio Canvas Background (Subtle workbench grid & warm top ambient) */
+.studio-canvas {
+  background-color: #0a0b0e;
+  background-image: 
+    radial-gradient(circle at 50% -20%, rgba(120, 119, 198, 0.12), transparent 50%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.045) 1px, transparent 0);
+  background-size: 100% 100%, 28px 28px;
+}
+
+/* Tactile Studio Surfaces */
+.studio-panel {
+  background: rgba(18, 20, 26, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.glass-card {
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+.studio-card {
+  background: #111319;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
-.glass-card:hover {
-  background: rgba(30, 41, 59, 0.8);
-  border-color: rgba(168, 85, 247, 0.4);
+.studio-card:hover {
+  background: #151821;
+  border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px -10px rgba(147, 51, 234, 0.25);
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Physical tactile button */
+.tactile-btn {
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.tactile-btn:active {
+  transform: translateY(1px);
+}
+
+/* Keycap styling */
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  line-height: 1;
+  border-radius: 4px;
+  background: #1a1e27;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #090a0d;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #232733;
   border-radius: 9999px;
+  border: 1px solid #090a0d;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #373e50;
 }
