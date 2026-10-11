@@ -1,32 +1,35 @@
-import React, { useState } from 'react';
-import { ChevronRight, Play, Copy, Check } from 'lucide-react';
+import React from 'react';
+import { ChevronRight, Play, ArrowRight } from 'lucide-react';
 import { ServiceItem } from '../data/services';
 
 interface ServiceCardProps {
   service: ServiceItem;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
 }
 
-export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = (e: React.MouseEvent) => {
-    e.preventDefault();
+export const ServiceCard: React.FC<ServiceCardProps> = ({
+  service,
+  isSelected,
+  onSelect,
+}) => {
+  const handleOpenTool = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(service.url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+    window.open(service.url, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <a
-      href={service.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="bg-[#13151b] border border-white/[0.07] rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between hover:border-white/[0.18] hover:bg-[#161822] transition-all group cursor-pointer text-left block"
+    <div
+      onClick={() => onSelect(service.id)}
+      className={`rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 group cursor-pointer relative ${
+        isSelected
+          ? 'bg-white ring-2 ring-zinc-900 border-transparent shadow-lg -translate-y-1'
+          : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md'
+      }`}
     >
       <div>
         {/* Card Thumbnail Image */}
-        <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden mb-3 bg-zinc-950 border border-white/[0.05]">
+        <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden mb-3 bg-gray-100 border border-gray-100">
           <img
             src={service.image}
             alt={service.name}
@@ -34,27 +37,40 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
             loading="lazy"
           />
 
-          {/* Optional Play Button Overlay (e.g. Video Clipper) */}
+          {/* Optional Play Button for Video Clipper */}
           {service.hasPlayButton && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-8 h-8 rounded-full bg-black/60 border border-white/25 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition-transform">
-                <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+              <div className="w-9 h-9 rounded-full bg-black/60 border border-white/25 flex items-center justify-center text-white backdrop-blur-xs group-hover:scale-110 transition-transform">
+                <Play className="w-4 h-4 fill-white ml-0.5" />
               </div>
+            </div>
+          )}
+
+          {/* Active selection badge */}
+          {isSelected && (
+            <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-zinc-900/90 text-[10px] text-white font-medium backdrop-blur-xs shadow-xs">
+              Đang chọn
             </div>
           )}
         </div>
 
         {/* Title + Chevron */}
         <div className="flex items-center justify-between gap-1 mb-1">
-          <h3 className="font-semibold text-sm text-white group-hover:text-amber-200 transition-colors">
+          <h3 className="font-bold text-sm text-zinc-900 group-hover:text-zinc-700 transition-colors">
             {service.name}
           </h3>
-          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all shrink-0" />
+          <ChevronRight
+            className={`w-4 h-4 transition-transform duration-200 ${
+              isSelected
+                ? 'text-zinc-900 translate-x-0.5'
+                : 'text-gray-400 group-hover:text-gray-600 group-hover:translate-x-0.5'
+            }`}
+          />
         </div>
 
-        {/* Description */}
-        <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-          {service.description}
+        {/* Short Description */}
+        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mt-1">
+          {service.shortDescription}
         </p>
 
         {/* Tags */}
@@ -62,7 +78,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
           {service.tags.map((tag) => (
             <span
               key={tag}
-              className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 text-slate-400 border border-white/[0.06]"
+              className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200/60"
             >
               {tag}
             </span>
@@ -70,25 +86,22 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
         </div>
       </div>
 
-      {/* Footer: Online status & Quick copy button */}
-      <div className="flex items-center justify-between mt-3.5 pt-2.5 border-t border-white/[0.05]">
-        <div className="flex items-center space-x-1.5 text-[11px] text-slate-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>Online</span>
+      {/* Footer: Status + Button 'Mở công cụ' */}
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+        <div className="flex items-center space-x-1.5 text-[11px] text-gray-500 font-medium">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span>{service.statusText || 'Sẵn sàng'}</span>
         </div>
 
         <button
-          onClick={handleCopy}
-          title="Sao chép link"
-          className="text-slate-500 hover:text-slate-300 p-1 rounded hover:bg-white/[0.05] transition-colors"
+          onClick={handleOpenTool}
+          className="bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-white text-xs px-3.5 py-1.5 rounded-full flex items-center space-x-1.5 font-medium transition-all shadow-2xs"
+          title={`Mở ${service.name}`}
         >
-          {copied ? (
-            <Check className="w-3 h-3 text-emerald-400" />
-          ) : (
-            <Copy className="w-3 h-3" />
-          )}
+          <span>Mở công cụ</span>
+          <ArrowRight className="w-3 h-3" />
         </button>
       </div>
-    </a>
+    </div>
   );
 };

@@ -1,22 +1,30 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search,
+  ArrowUpRight,
+  Copy,
+  Check,
+  Zap,
   Database,
-  Cpu,
-  Image as ImageIcon,
-  Gamepad2,
+  Shield,
   ChevronRight,
   Compass,
 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
-import { QuickStats } from './components/QuickStats';
 import { ServiceCard } from './components/ServiceCard';
-import { SERVICES, CATEGORIES } from './data/services';
+import { SERVICES, CATEGORIES, ServiceItem } from './data/services';
 
 export const App: React.FC = () => {
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('multigen-main');
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [copied, setCopied] = useState<boolean>(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Selected tool for dynamic Hero Banner description
+  const selectedService: ServiceItem = useMemo(() => {
+    return SERVICES.find((s) => s.id === selectedServiceId) || SERVICES[0];
+  }, [selectedServiceId]);
 
   // Keyboard shortcut '/' to focus search
   useEffect(() => {
@@ -42,7 +50,8 @@ export const App: React.FC = () => {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
         service.name.toLowerCase().includes(q) ||
-        service.description.toLowerCase().includes(q) ||
+        service.shortDescription.toLowerCase().includes(q) ||
+        service.detailedDescription.toLowerCase().includes(q) ||
         service.tags.some((tag) => tag.toLowerCase().includes(q));
 
       return matchesCategory && matchesSearch;
@@ -60,63 +69,143 @@ export const App: React.FC = () => {
     return counts;
   }, []);
 
+  const handleCopySelected = () => {
+    navigator.clipboard.writeText(selectedService.url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0c0e12] flex flex-col text-slate-100 font-sans selection:bg-white/20 selection:text-white">
+    <div className="min-h-screen bg-[#f8fafc] text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        {/* Hero Section */}
-        <div className="max-w-3xl mb-8">
-          <div className="flex items-center space-x-1.5 text-[11px] font-mono tracking-wider uppercase text-slate-400 font-semibold mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-            <span>CREATIVE TOOLS HUB</span>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Dynamic Hero Banner (Changes based on selected card) */}
+        <div className="relative bg-[#0c0d10] text-white rounded-3xl overflow-hidden border border-zinc-800/80 shadow-xl mb-10 min-h-[300px] flex items-center">
+          {/* Right Background Artwork Setup */}
+          <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[48%] overflow-hidden pointer-events-none">
+            <img
+              src="/images/hero-monitor.jpg"
+              alt="Creative Workspace"
+              className="w-full h-full object-cover object-left"
+            />
+            {/* Soft dark gradient fade onto the text side */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0d10] via-[#0c0d10]/40 to-transparent" />
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-2.5 leading-tight">
-            Tất cả công cụ của MultiGen — gọn gàng ở một nơi
-          </h1>
+          {/* Left Dynamic Content */}
+          <div className="relative z-10 p-6 sm:p-10 lg:p-12 max-w-2xl w-full">
+            {/* Tagline */}
+            <div className="flex items-center space-x-2 text-[11px] font-mono tracking-wider uppercase text-zinc-400 font-semibold mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>CREATIVE TOOLS HUB • {selectedService.category.toUpperCase()}</span>
+            </div>
 
-          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl">
-            Bộ công cụ AI, video, pixel art và sáng tạo nội dung, chạy trên hạ tầng GPU riêng.
-            <br />
-            Đơn giản, nhanh và tập trung cho công việc thật sự quan trọng.
-          </p>
+            {/* Dynamic Headline */}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-3 leading-tight transition-all duration-300">
+              {selectedService.name}
+            </h1>
+
+            {/* Dynamic Detailed Description */}
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 transition-all duration-300 max-w-xl">
+              {selectedService.detailedDescription}
+            </p>
+
+            {/* 3 Dynamic Features Badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-7 max-w-2xl">
+              {selectedService.features.map((feature, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center space-x-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl p-2.5 backdrop-blur-xs transition-all hover:bg-white/[0.08]"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 shrink-0">
+                    {feature.icon === 'zap' ? (
+                      <Zap className="w-3.5 h-3.5" />
+                    ) : feature.icon === 'database' ? (
+                      <Database className="w-3.5 h-3.5" />
+                    ) : (
+                      <Shield className="w-3.5 h-3.5" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-white truncate">
+                      {feature.title}
+                    </div>
+                    <div className="text-[10px] text-zinc-400 truncate">{feature.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Buttons in Hero Banner */}
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href={selectedService.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white hover:bg-zinc-100 text-zinc-950 font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full flex items-center space-x-2 transition-all shadow-md active:scale-95"
+              >
+                <span>Mở {selectedService.name}</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </a>
+
+              <button
+                onClick={handleCopySelected}
+                className="bg-white/10 hover:bg-white/15 text-white font-medium text-xs sm:text-sm px-4 py-2.5 rounded-full flex items-center space-x-2 transition-all border border-white/10"
+              >
+                {copied ? (
+                  <Check className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+                <span>{copied ? 'Đã sao chép URL' : 'Sao chép link'}</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Top 4 Spec Cards */}
-        <QuickStats />
+        {/* Section Header: Công cụ nổi bật + Search Input */}
+        <div id="tools" className="mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
+                Công cụ nổi bật
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                Chọn công cụ phù hợp với nhu cầu của bạn
+              </p>
+            </div>
 
-        {/* Search & Category Filter Bar */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 mb-6">
-          {/* Search Box */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Tìm công cụ, ví dụ: video, pixel, comfyui..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2 rounded-full bg-zinc-900/90 border border-white/[0.08] text-xs sm:text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-white/20 transition-all font-sans"
-            />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
-              {searchQuery ? (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="text-xs text-slate-400 hover:text-slate-200 px-1"
-                >
-                  Xoá
-                </button>
-              ) : (
-                <span className="w-4 h-4 rounded bg-zinc-800 text-[10px] text-slate-400 border border-white/10 flex items-center justify-center font-mono select-none">
-                  /
-                </span>
-              )}
+            {/* Search Input */}
+            <div className="relative w-full md:w-80">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Tìm công cụ, ví dụ: video, pixel..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-9 py-2 rounded-full bg-white border border-gray-200 text-xs sm:text-sm text-zinc-800 placeholder-gray-400 focus:outline-none focus:border-zinc-400 shadow-2xs transition-all"
+              />
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
+                {searchQuery ? (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-xs text-gray-400 hover:text-gray-600"
+                  >
+                    Xoá
+                  </button>
+                ) : (
+                  <span className="w-4 h-4 rounded bg-gray-100 text-[10px] text-gray-400 border border-gray-200 flex items-center justify-center font-mono select-none">
+                    /
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             {CATEGORIES.map((cat) => {
               const isSelected = selectedCategory === cat;
               const count = categoryCounts[cat] || 0;
@@ -127,16 +216,16 @@ export const App: React.FC = () => {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-full text-xs transition-all flex items-center space-x-1.5 ${
                     isSelected
-                      ? 'bg-white text-zinc-950 font-medium shadow-sm'
-                      : 'bg-zinc-900/80 hover:bg-zinc-800 text-slate-400 hover:text-slate-200 border border-white/[0.07]'
+                      ? 'bg-zinc-900 text-white font-medium shadow-xs'
+                      : 'bg-white hover:bg-gray-100 text-gray-600 hover:text-zinc-900 border border-gray-200'
                   }`}
                 >
                   <span>{cat}</span>
                   <span
                     className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
                       isSelected
-                        ? 'bg-zinc-200 text-zinc-900 font-semibold'
-                        : 'bg-white/[0.06] text-slate-400'
+                        ? 'bg-zinc-800 text-zinc-300'
+                        : 'bg-gray-100 text-gray-500'
                     }`}
                   >
                     {count}
@@ -147,20 +236,25 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* 5 Tool Cards Grid */}
+        {/* 4 Tool Cards Grid */}
         {filteredServices.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
             {filteredServices.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSelected={service.id === selectedServiceId}
+                onSelect={(id) => setSelectedServiceId(id)}
+              />
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-[#13151b] rounded-2xl border border-white/[0.07] mb-8">
-            <Compass className="w-10 h-10 text-slate-500 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-slate-200 mb-1">
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 mb-12">
+            <Compass className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+            <h3 className="text-base font-semibold text-zinc-800 mb-1">
               Không tìm thấy công cụ phù hợp
             </h3>
-            <p className="text-xs text-slate-400 mb-4 max-w-sm mx-auto">
+            <p className="text-xs text-gray-500 mb-4">
               Không có ứng dụng nào khớp với từ khóa "{searchQuery}".
             </p>
             <button
@@ -168,7 +262,7 @@ export const App: React.FC = () => {
                 setSearchQuery('');
                 setSelectedCategory('Tất cả');
               }}
-              className="px-3.5 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs text-slate-200 font-medium transition-colors border border-white/[0.08]"
+              className="px-4 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition-colors"
             >
               Đặt lại bộ lọc
             </button>
@@ -176,97 +270,105 @@ export const App: React.FC = () => {
         )}
 
         {/* CREATOR'S WORKFLOW (Bottom Section) */}
-        <div className="bg-[#12141a] border border-white/[0.07] rounded-2xl p-5 sm:p-6">
+        <div id="workflow" className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             {/* Left Header */}
-            <div className="max-w-md shrink-0">
-              <div className="text-[10px] font-mono tracking-wider uppercase text-slate-400 font-semibold mb-1">
+            <div className="max-w-xs shrink-0">
+              <div className="text-[10px] font-mono tracking-wider uppercase text-gray-400 font-semibold mb-1">
                 CREATOR'S WORKFLOW
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-white">
-                Từ dữ liệu đến game assets
+              <h3 className="text-base sm:text-lg font-bold text-zinc-900">
+                Từ ý tưởng đến sản phẩm
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Quy trình làm việc đơn giản mà hiệu quả, được mình sử dụng hàng ngày.
+              <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                Quy trình đơn giản, giúp bạn làm việc hiệu quả hơn.
               </p>
             </div>
 
-            {/* Right Steps Pipeline */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-3 w-full lg:w-auto">
+            {/* Right 4 Steps Pipeline */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-2 w-full lg:w-auto">
               {/* Step 1 */}
               <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
                   1
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
-                  <Database className="w-4 h-4" />
-                </div>
                 <div>
-                  <div className="text-xs font-semibold text-white">Dataset</div>
-                  <div className="text-[11px] text-slate-400">Chuẩn bị và xử lý dữ liệu</div>
+                  <div className="text-xs font-bold text-zinc-900">Chuẩn bị tài nguyên</div>
+                  <div className="text-[11px] text-gray-400">Ý tưởng, tài liệu, hình ảnh...</div>
                 </div>
               </div>
 
               {/* Connector 1 */}
-              <div className="hidden sm:flex items-center text-slate-600 px-1">
+              <div className="hidden sm:flex items-center text-gray-300 px-2">
                 <ChevronRight className="w-4 h-4" />
               </div>
 
               {/* Step 2 */}
               <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
                   2
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
-                  <Cpu className="w-4 h-4" />
-                </div>
                 <div>
-                  <div className="text-xs font-semibold text-white">Train GPU</div>
-                  <div className="text-[11px] text-slate-400">Huấn luyện mô hình</div>
+                  <div className="text-xs font-bold text-zinc-900">Sử dụng công cụ</div>
+                  <div className="text-[11px] text-gray-400">Chọn công cụ phù hợp</div>
                 </div>
               </div>
 
               {/* Connector 2 */}
-              <div className="hidden sm:flex items-center text-slate-600 px-1">
+              <div className="hidden sm:flex items-center text-gray-300 px-2">
                 <ChevronRight className="w-4 h-4" />
               </div>
 
               {/* Step 3 */}
               <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
                   3
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
-                  <ImageIcon className="w-4 h-4" />
-                </div>
                 <div>
-                  <div className="text-xs font-semibold text-white">Generation</div>
-                  <div className="text-[11px] text-slate-400">Tạo hình ảnh / video</div>
+                  <div className="text-xs font-bold text-zinc-900">Tạo và chỉnh sửa</div>
+                  <div className="text-[11px] text-gray-400">Sinh nội dung, xử lý</div>
                 </div>
               </div>
 
               {/* Connector 3 */}
-              <div className="hidden sm:flex items-center text-slate-600 px-1">
+              <div className="hidden sm:flex items-center text-gray-300 px-2">
                 <ChevronRight className="w-4 h-4" />
               </div>
 
               {/* Step 4 */}
               <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 text-[11px] text-slate-400 font-mono flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
                   4
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/[0.08] flex items-center justify-center shrink-0 text-slate-300">
-                  <Gamepad2 className="w-4 h-4" />
-                </div>
                 <div>
-                  <div className="text-xs font-semibold text-white">Game Assets</div>
-                  <div className="text-[11px] text-slate-400">Tích hợp vào dự án game</div>
+                  <div className="text-xs font-bold text-zinc-900">Xuất và sử dụng</div>
+                  <div className="text-[11px] text-gray-400">Tải về và áp dụng</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="mt-auto py-6 border-t border-gray-200 bg-white text-xs text-gray-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            © {new Date().getFullYear()} <span className="font-semibold text-zinc-900">MultiGen Workbench</span> — Xây dựng bởi{' '}
+            <a
+              href="https://github.com/trinhmanhviet"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-900 font-medium hover:underline"
+            >
+              Trịnh Mạnh Việt
+            </a>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="font-mono text-gray-400">hub.multigen.store</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
