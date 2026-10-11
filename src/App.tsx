@@ -9,6 +9,7 @@ import {
   Shield,
   ChevronRight,
   Compass,
+  Sparkles,
 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { ServiceCard } from './components/ServiceCard';
@@ -21,7 +22,7 @@ export const App: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Selected tool for dynamic Hero Banner description
+  // Selected tool for the dynamic bottom detail section
   const selectedService: ServiceItem = useMemo(() => {
     return SERVICES.find((s) => s.id === selectedServiceId) || SERVICES[0];
   }, [selectedServiceId]);
@@ -80,8 +81,8 @@ export const App: React.FC = () => {
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Dynamic Hero Banner (Changes based on selected card) */}
-        <div className="relative bg-[#0c0d10] text-white rounded-3xl overflow-hidden border border-zinc-800/80 shadow-xl mb-10 min-h-[300px] flex items-center">
+        {/* Static Hero Banner: Hub Introduction */}
+        <div className="relative bg-[#0c0d10] text-white rounded-3xl overflow-hidden border border-zinc-800/80 shadow-xl mb-10 min-h-[290px] flex items-center">
           {/* Right Background Artwork Setup */}
           <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[48%] overflow-hidden pointer-events-none">
             <img
@@ -93,73 +94,57 @@ export const App: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-[#0c0d10] via-[#0c0d10]/40 to-transparent" />
           </div>
 
-          {/* Left Dynamic Content */}
+          {/* Left Static Introduction Content */}
           <div className="relative z-10 p-6 sm:p-10 lg:p-12 max-w-2xl w-full">
             {/* Tagline */}
             <div className="flex items-center space-x-2 text-[11px] font-mono tracking-wider uppercase text-zinc-400 font-semibold mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-              <span>CREATIVE TOOLS HUB • {selectedService.category.toUpperCase()}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <span>CREATIVE TOOLS HUB</span>
             </div>
 
-            {/* Dynamic Headline */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-3 leading-tight transition-all duration-300">
-              {selectedService.name}
+            {/* Static Headline */}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-3 leading-tight">
+              Bộ công cụ sáng tạo của MultiGen
             </h1>
 
-            {/* Dynamic Detailed Description */}
-            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 transition-all duration-300 max-w-xl">
-              {selectedService.detailedDescription}
+            {/* Static Description */}
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 max-w-xl">
+              Tập hợp các công cụ AI, video, 3D, pixel art và nhiều công cụ khác.
+              <br className="hidden sm:inline" />
+              Đơn giản, nhanh chóng, mạnh mẽ – phục vụ cho công việc sáng tạo hàng ngày.
             </p>
 
-            {/* 3 Dynamic Features Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-7 max-w-2xl">
-              {selectedService.features.map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center space-x-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl p-2.5 backdrop-blur-xs transition-all hover:bg-white/[0.08]"
-                >
-                  <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 shrink-0">
-                    {feature.icon === 'zap' ? (
-                      <Zap className="w-3.5 h-3.5" />
-                    ) : feature.icon === 'database' ? (
-                      <Database className="w-3.5 h-3.5" />
-                    ) : (
-                      <Shield className="w-3.5 h-3.5" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-semibold text-white truncate">
-                      {feature.title}
-                    </div>
-                    <div className="text-[10px] text-zinc-400 truncate">{feature.desc}</div>
-                  </div>
+            {/* 3 Static Feature Badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-2xl">
+              <div className="flex items-center space-x-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl p-2.5 backdrop-blur-xs">
+                <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 shrink-0">
+                  <Zap className="w-3.5 h-3.5" />
                 </div>
-              ))}
-            </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-white truncate">Chạy trên GPU riêng</div>
+                  <div className="text-[10px] text-zinc-400 truncate">RTX 3090 Ti 24GB</div>
+                </div>
+              </div>
 
-            {/* CTA Buttons in Hero Banner */}
-            <div className="flex flex-wrap items-center gap-3">
-              <a
-                href={selectedService.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white hover:bg-zinc-100 text-zinc-950 font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full flex items-center space-x-2 transition-all shadow-md active:scale-95"
-              >
-                <span>Mở {selectedService.name}</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </a>
+              <div className="flex items-center space-x-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl p-2.5 backdrop-blur-xs">
+                <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 shrink-0">
+                  <Database className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-white truncate">Không cần cài đặt</div>
+                  <div className="text-[10px] text-zinc-400 truncate">Truy cập ngay trên web</div>
+                </div>
+              </div>
 
-              <button
-                onClick={handleCopySelected}
-                className="bg-white/10 hover:bg-white/15 text-white font-medium text-xs sm:text-sm px-4 py-2.5 rounded-full flex items-center space-x-2 transition-all border border-white/10"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-                <span>{copied ? 'Đã sao chép URL' : 'Sao chép link'}</span>
-              </button>
+              <div className="flex items-center space-x-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl p-2.5 backdrop-blur-xs">
+                <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 shrink-0">
+                  <Shield className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-white truncate">Ổn định & riêng tư</div>
+                  <div className="text-[10px] text-zinc-400 truncate">Dữ liệu không lưu công khai</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -238,7 +223,7 @@ export const App: React.FC = () => {
 
         {/* 4 Tool Cards Grid */}
         {filteredServices.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
             {filteredServices.map((service) => (
               <ServiceCard
                 key={service.id}
@@ -249,7 +234,7 @@ export const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 mb-12">
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 mb-10">
             <Compass className="w-10 h-10 text-gray-400 mx-auto mb-3" />
             <h3 className="text-base font-semibold text-zinc-800 mb-1">
               Không tìm thấy công cụ phù hợp
@@ -269,82 +254,117 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* CREATOR'S WORKFLOW (Bottom Section) */}
-        <div id="workflow" className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            {/* Left Header */}
-            <div className="max-w-xs shrink-0">
-              <div className="text-[10px] font-mono tracking-wider uppercase text-gray-400 font-semibold mb-1">
-                CREATOR'S WORKFLOW
+        {/* Dynamic Detail & Workflow Section (Changes based on selected card) */}
+        <div
+          id="tool-detail"
+          className="bg-white border-2 border-zinc-900/10 rounded-3xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative overflow-hidden"
+        >
+          {/* Top Header of Selected Tool */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+            <div>
+              <div className="flex items-center space-x-2 text-[11px] font-mono uppercase tracking-wider text-amber-600 font-bold mb-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>CHI TIẾT CÔNG CỤ ĐANG CHỌN • {selectedService.category.toUpperCase()}</span>
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-zinc-900">
-                Từ ý tưởng đến sản phẩm
-              </h3>
-              <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
-                Quy trình đơn giản, giúp bạn làm việc hiệu quả hơn.
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
+                  {selectedService.name}
+                </h3>
+                <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-full border border-gray-200">
+                  {selectedService.tagline}
+                </span>
+              </div>
             </div>
 
-            {/* Right 4 Steps Pipeline */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-2 w-full lg:w-auto">
-              {/* Step 1 */}
-              <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
-                  1
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-zinc-900">Chuẩn bị tài nguyên</div>
-                  <div className="text-[11px] text-gray-400">Ý tưởng, tài liệu, hình ảnh...</div>
-                </div>
-              </div>
+            {/* Action buttons */}
+            <div className="flex items-center space-x-3 shrink-0">
+              <button
+                onClick={handleCopySelected}
+                className="px-3.5 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-medium text-zinc-700 flex items-center space-x-1.5 transition-colors border border-gray-200"
+                title="Sao chép link"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-600">Đã chép link</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Sao chép link</span>
+                  </>
+                )}
+              </button>
 
-              {/* Connector 1 */}
-              <div className="hidden sm:flex items-center text-gray-300 px-2">
-                <ChevronRight className="w-4 h-4" />
-              </div>
+              <a
+                href={selectedService.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-white flex items-center space-x-1.5 transition-all shadow-xs active:scale-95"
+              >
+                <span>Mở {selectedService.name}</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
 
-              {/* Step 2 */}
-              <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
-                  2
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-zinc-900">Sử dụng công cụ</div>
-                  <div className="text-[11px] text-gray-400">Chọn công cụ phù hợp</div>
-                </div>
-              </div>
+          {/* Description & Feature Specs */}
+          <div className="py-6">
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed max-w-4xl mb-6">
+              {selectedService.detailedDescription}
+            </p>
 
-              {/* Connector 2 */}
-              <div className="hidden sm:flex items-center text-gray-300 px-2">
-                <ChevronRight className="w-4 h-4" />
-              </div>
+            {/* 3 Specific Feature Badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {selectedService.features.map((feature, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center space-x-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl p-3.5"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center shrink-0">
+                    {feature.icon === 'zap' ? (
+                      <Zap className="w-4 h-4 text-amber-400" />
+                    ) : feature.icon === 'database' ? (
+                      <Database className="w-4 h-4 text-sky-400" />
+                    ) : (
+                      <Shield className="w-4 h-4 text-emerald-400" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-zinc-900 truncate">{feature.title}</div>
+                    <div className="text-[11px] text-gray-500 truncate">{feature.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-              {/* Step 3 */}
-              <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
-                  3
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-zinc-900">Tạo và chỉnh sửa</div>
-                  <div className="text-[11px] text-gray-400">Sinh nội dung, xử lý</div>
-                </div>
-              </div>
+          {/* 4 Workflow Steps Pipeline for this specific tool */}
+          <div className="pt-6 border-t border-gray-100">
+            <div className="text-[10px] font-mono tracking-wider uppercase text-gray-400 font-bold mb-3">
+              QUY TRÌNH THỰC HIỆN GỢI Ý
+            </div>
 
-              {/* Connector 3 */}
-              <div className="hidden sm:flex items-center text-gray-300 px-2">
-                <ChevronRight className="w-4 h-4" />
-              </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-2">
+              {selectedService.workflowSteps.map((step, idx) => (
+                <React.Fragment key={step.step}>
+                  <div className="flex items-center space-x-2.5 flex-1 min-w-0">
+                    <div className="w-6 h-6 rounded-full bg-zinc-900 text-white text-[11px] font-bold font-mono flex items-center justify-center shrink-0">
+                      {step.step}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-zinc-900 truncate">{step.title}</div>
+                      <div className="text-[11px] text-gray-500 truncate">{step.desc}</div>
+                    </div>
+                  </div>
 
-              {/* Step 4 */}
-              <div className="flex items-center space-x-2.5">
-                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 text-[11px] text-zinc-700 font-bold font-mono flex items-center justify-center shrink-0">
-                  4
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-zinc-900">Xuất và sử dụng</div>
-                  <div className="text-[11px] text-gray-400">Tải về và áp dụng</div>
-                </div>
-              </div>
+                  {idx < selectedService.workflowSteps.length - 1 && (
+                    <div className="hidden sm:flex items-center text-gray-300 px-1 shrink-0">
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
             </div>
           </div>
         </div>
