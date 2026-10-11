@@ -387,7 +387,7 @@ export const App: React.FC = () => {
           <div>
             © {new Date().getFullYear()} <span className="font-semibold text-zinc-900">MultiGen Workbench</span> — Xây dựng bởi{' '}
             <a
-              href="https://trinhmanhviet.dev"
+              href="https://manhvietai.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-zinc-900 font-medium hover:underline"

@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab = 'Trang chủ' }) => 
             Hướng dẫn
           </a>
           <a
-            href="https://trinhmanhviet.dev"
+            href="https://manhvietai.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm font-medium text-gray-500 hover:text-zinc-900 transition-colors py-1"
@@ -64,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab = 'Trang chủ' }) => 
 
           {/* User Profile */}
           <a
-            href="https://trinhmanhviet.dev"
+            href="https://manhvietai.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-2 text-zinc-700 hover:text-zinc-900 transition-colors py-1 pl-1"
